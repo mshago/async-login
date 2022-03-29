@@ -55,10 +55,9 @@ export default function App() {
 
   const authContext = React.useMemo(
     () => ({
-      signIn: async data => {
+      signIn: async () => {
         try {
-          let d = await AsyncStorage.setItem('token', 'Miguel Luna')
-          console.log(d)
+          await AsyncStorage.setItem('token', 'Miguel Luna')
         } catch (e) {
           // saving error
         }
