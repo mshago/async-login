@@ -6,12 +6,10 @@ import {LoginScreen} from './src/screen/LoginScreen';
 import {HomeScreen} from './src/screen/HomeScreen';
 import { SplashScreen } from './src/screen/SplashScree';
 import { AuthContext } from './src/context/authContext';
-
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
 const Stack = createNativeStackNavigator();
 
-export default function App({navigation}) {
+export default function App() {
 
   const [state, dispatch] = React.useReducer(
     (prevState, action) => {
@@ -47,7 +45,7 @@ export default function App({navigation}) {
     const getData = async () => {
       let token;
       try {
-        token = await AsyncStorage.getItem('@token');
+        token = await AsyncStorage.getItem('token');
       } catch (e) {}
       dispatch({type: 'RESTORE_TOKEN', token: token});
       console.log(token)
@@ -59,7 +57,7 @@ export default function App({navigation}) {
     () => ({
       signIn: async data => {
         try {
-          let d = await AsyncStorage.setItem('@token', 'Miguel Luna')
+          let d = await AsyncStorage.setItem('token', 'Miguel Luna')
           console.log(d)
         } catch (e) {
           // saving error
@@ -68,14 +66,11 @@ export default function App({navigation}) {
       },
       signOut: async () => {
         try {
-          await AsyncStorage.setItem('@token', null)
+          await AsyncStorage.setItem('token', null)
         } catch (e) {
           // saving error
         }
         dispatch({type: 'SIGN_OUT'})
-      },
-      signUp: async data => {
-        dispatch({type: 'SIGN_IN', token: 'Miguel Luna'});
       },
     }),
     [],
