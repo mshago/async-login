@@ -8,7 +8,7 @@ export const LoginScreen = () => {
   return (
     <View style={styles.container}>
       <Text>LoginScreen</Text>
-      <Button title="Press to Log In" onPress={() => signIn()} />
+      <Button title="Press to Log In" onPress={() => signIn('Miguel Luna')} />
     </View>
   );
 };
