@@ -1,75 +1,49 @@
-
-import React, { useEffect} from 'react';
+import React, {useEffect} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {LoginScreen} from './src/screen/LoginScreen';
 import {HomeScreen} from './src/screen/HomeScreen';
-import { SplashScreen } from './src/screen/SplashScree';
-import { AuthContext } from './src/context/authContext';
+import {SplashScreen} from './src/screen/SplashScree';
+import {AuthContext} from './src/context/authContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {Alert} from 'react-native';
+import {reducer, initialState} from './src/context/authReducer';
+import {TOKEN_NAME} from './src/config';
+
 const Stack = createNativeStackNavigator();
 
 export default function App() {
-
-  const [state, dispatch] = React.useReducer(
-    (prevState, action) => {
-      switch (action.type) {
-        case 'RESTORE_TOKEN':
-          return {
-            ...prevState,
-            token: action.token,
-            isLoading: false,
-          };
-        case 'SIGN_IN':
-          return {
-            ...prevState,
-            isSignout: false,
-            token: action.token,
-          };
-        case 'SIGN_OUT':
-          return {
-            ...prevState,
-            isSignout: true,
-            token: false,
-          };
-      }
-    },
-    {
-      isLoading: true,
-      isSignout: false,
-      token: null,
-    },
-  );
+  const [state, dispatch] = React.useReducer(reducer, initialState);
 
   useEffect(() => {
-    const getData = async () => {
-      let token;
+    const getData = async token => {
       try {
-        token = await AsyncStorage.getItem('token');
-      } catch (e) {}
+        await AsyncStorage.getItem(token);
+      } catch (error) {
+        Alert.alert(error);
+      }
       dispatch({type: 'RESTORE_TOKEN', token: token});
-      console.log(token)
     };
-    getData();
+    getData(TOKEN_NAME);
   }, []);
 
   const authContext = React.useMemo(
     () => ({
-      signIn: async () => {
+      signIn: async tokenValue => {
         try {
-          await AsyncStorage.setItem('token', 'Miguel Luna')
+          await AsyncStorage.setItem(TOKEN_NAME, tokenValue);
         } catch (e) {
           // saving error
         }
-        dispatch({type: 'SIGN_IN', token: 'Miguel Luna'});
+        dispatch({type: 'SIGN_IN', token: tokenValue});
       },
       signOut: async () => {
         try {
-          await AsyncStorage.setItem('token', null)
+          await AsyncStorage.setItem(TOKEN_NAME, null);
         } catch (e) {
           // saving error
         }
-        dispatch({type: 'SIGN_OUT'})
+        dispatch({type: 'SIGN_OUT'});
       },
     }),
     [],
@@ -80,13 +54,12 @@ export default function App() {
       <NavigationContainer>
         <Stack.Navigator>
           {state.isLoading ? (
-            <Stack.Screen name='Splash' component={SplashScreen}/>
-          ) : (state.token ? (
+            <Stack.Screen name="Splash" component={SplashScreen} />
+          ) : state.token ? (
             <Stack.Screen name="Home" component={HomeScreen} />
           ) : (
             <Stack.Screen name="Login" component={LoginScreen} />
-          ))
-          }
+          )}
         </Stack.Navigator>
       </NavigationContainer>
     </AuthContext.Provider>
